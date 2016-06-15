@@ -19,6 +19,21 @@ GitHub URI: https://github.com/pronamic/wp-orbis-comment-editor
 */
 
 /**
+ * Proper way to enqueue scripts and styles.
+ */
+function orbis_comment_form_enqueue_scripts() {
+	wp_register_script(
+		'orbis-comment-editor',
+		plugins_url( 'script.js', __FILE__ ),
+		array( 'jquery', 'editor' ),
+		'1.0.0',
+		true
+	);
+}
+
+add_action( 'wp_enqueue_scripts', 'orbis_comment_form_enqueue_scripts' );
+
+/**
  * Comment form field comment.
  *
  * @see https://github.com/WordPress/WordPress/blob/4.5.2/wp-includes/comment-template.php#L2295-L2302
@@ -30,34 +45,9 @@ GitHub URI: https://github.com/pronamic/wp-orbis-comment-editor
  * @return string
  */
 function orbis_comment_form_field_comment( $field ) {
+	wp_enqueue_script( 'orbis-comment-editor' );
+
 	ob_start();
-
-	?>
-	<script type="text/javascript">
-		var fixCommentEditor = function() {
-			var settings = tinymce.get( 'comment' ).settings;
-
-			tinymce.remove( '#comment' );
-
-			tinymce.init( settings );
-
-			var editor = tinymce.get( 'comment' );
-
-			editor.focus();
-
-			editor.selection.select( editor.getBody(), true );
-			editor.selection.collapse( false );
-		};
-
-		jQuery( function( $ ) {
-			$( '.comment-reply-link' ).click( function( e ) {
-				fixCommentEditor();
-
-				$( '#cancel-comment-reply-link' ).one( 'click', fixCommentEditor );
-			} );
-		} );
-	</script>
-	<?php
 
 	wp_editor( '', 'comment', array(
 		'teeny'         => true,
